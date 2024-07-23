@@ -43,3 +43,42 @@ else:
     print(f"Failed to retrieve access token: {response.status_code}")
     print(response.json())
 # %%
+
+##criando função para realziar chamada a API, recebe url ( endpoint que estamos acessando) e token de acesso como parâmetros
+def api_call(url, access_token):
+    """
+    Chama a API do Spotify usando um endpoint de URL e um token de acesso para recuperar dados no formato JSON.
+
+    Args:
+        url (str): Endpoint de URL para acessar dados de faixas disponíveis.
+            URL padrão fornecida - https://api.spotify.com/v1/search?q=genre:{genre}&type=track&market={market}&limit={limit}&offset={offset}
+        
+        access_token (str): Token de acesso à API do Spotify fornecido com o uso da função get_token.
+
+    Returns:
+        dict: Objeto JSON com a resposta da API.
+    """
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get(url, headers= headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f'Chamada a API falhou:{response.status_code}')
+        return response.json()
+    
+    
+
+# %%
+
+#realizando chamada a endpoint que retorna generos e informações acerca de album, traks, shows etc
+url = 'https://api.spotify.com/v1/search?q=genre:rock&type=track&market=BR&limit=20&offset=0'
+api_response = api_call(url, access_token)
+api_response
+
+# %%
+api_response.keys()
+# %%
+api_response['tracks']
+# %%
+api_response['tracks'].keys()
+# %%
