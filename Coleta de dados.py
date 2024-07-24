@@ -82,3 +82,44 @@ api_response['tracks']
 # %%
 api_response['tracks'].keys()
 # %%
+##na Key itens é onde podemos observar os dados relacionados a faixas
+api_response['tracks']['items'][0].keys()
+# %%
+## é possíel acessar as musicas de albuns acessando a chave items e passando indice de musica
+api_response['tracks']['items'][0]
+# %%
+
+## Podemos selecionar alguns dados para análise, filtraremos alguns dados
+## Popularidade de genêros ao longo dos anos
+api_response['tracks']['items'][0]['id']
+
+# %%
+# Os acessos são dados através da entrada na lista e percorrendo os indices e as chaves que queremos acessar, como abaixo onde acessamos as informacoes da Banda
+api_response['tracks']['items'][0]['artists'][0].keys()
+# %%
+#  abaixo onde acessamos o ID da banda
+api_response['tracks']['items'][0]['artists'][0]['id']
+
+# %%
+#acessando id de primeira musica
+api_response['tracks']['items'][0]['id']
+# %%
+api_response['tracks']['items'][0].keys()
+# %%
+## Nome da primeira musica
+api_response['tracks']['items'][0]['name']
+
+# %%
+## Duração da primeira música em milisegundos
+duracao = api_response['tracks']['items'][0]['duration_ms']
+# %%
+## Como resultado vem em milisegundos, abaixo segue operaçao para encontrar em minutos
+musica_minutos = (duracao // 1000) //60 
+print( str(musica_minutos) + ' ' + 'Minutos')
+# %%
+## Nome do artista do primeiro item
+api_response['tracks']['items'][0]['artists'][0]['name']
+# %%
+##Nome do album da primeira música
+api_response['tracks']['items'][0]['album']['name']
+# %%
