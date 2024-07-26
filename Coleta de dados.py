@@ -71,7 +71,11 @@ def api_call(url, access_token):
 # %%
 
 #realizando chamada a endpoint que retorna generos e informações acerca de album, traks, shows etc
-url = 'https://api.spotify.com/v1/search?q=genre:rock&type=track&market=BR&limit=20&offset=0'
+market = 'BR'
+genre = 'rock'
+limit = 5
+offset = 0
+url = f'https://api.spotify.com/v1/search?q=genre:{genre}&type=track&market={market}&limit={limit}&offset={offset}'
 api_response = api_call(url, access_token)
 api_response
 
@@ -122,4 +126,85 @@ api_response['tracks']['items'][0]['artists'][0]['name']
 # %%
 ##Nome do album da primeira música
 api_response['tracks']['items'][0]['album']['name']
+# %%
+api_response['tracks']['items'][0]['album'].keys()
+# %%
+#data de lançamento do album do primeiro item
+api_response['tracks']['items'][0]['album']['release_date']
+# %%
+#Popularidade da música do item 1
+api_response['tracks']['items'][0]['popularity']
+# %%
+#Abaixo, filtraremos os dados que queremos selecionar e criaremos um dataframe
+track_id = api_response['tracks']['items'][0]['id']
+track_name = api_response['tracks']['items'][0]['name']
+# ajustando valor retornado de milisegundos para minutos, como lambda nao aceita receber dictionary, criamos uma variavel que recebe retorno da API e passamos essa variael na função lambda
+duration_ms = api_response['tracks']['items'][0]['duration_ms']
+track_duration = lambda duration_ms : (duration_ms // 1000) // 60
+duration_in_minutes = track_duration(duration_ms)
+artist_name = api_response['tracks']['items'][0]['artists'][0]['name']
+album_name = api_response['tracks']['items'][0]['album']['name']
+album_release_date = api_response['tracks']['items'][0]['album']['release_date']
+popularity = api_response['tracks']['items'][0]['popularity']
+genre = 'rock'
+
+#Criando Dataframe
+
+track_df = pd.DataFrame(
+    {
+    'track_id': [track_id],
+    'track_name': [track_name],
+    'track_duration_ms':[duration_in_minutes],
+    'artist_name': [artist_name],
+    'album_name': [album_name],
+    'album_release_date': [album_release_date],
+    'popularity': [popularity],
+    'genre': [genre]
+    }
+)
+
+
+
+
+# %%
+print(f'Dataframe possui{track_df.shape[1]} colunas')
+track_df
+# %%
+# Para inserir todos os registros de músicas, faremos uma iteraçao sobre os registros, passando valor iteravel na chamadaa a API no api_response
+selected_genres = ['blues', 'rock', 'soul']
+limit = 5
+offset = 0
+track_df = []
+
+for genre in selected_genres:
+    url = f'https://api.spotify.com/v1/search?q=genre:{genre}&type=track&market=BR&limit={limit}&offset={offset}'
+    api_response = api_call(url, access_token)
+    
+    for i in range(limit):
+        track_id = api_response['tracks']['items'][i]['id']
+        track_name = api_response['tracks']['items'][i]['name']
+        track_duration_ms = api_response['tracks']['items'][i]['duration_ms']
+        artist_name = api_response['tracks']['items'][i]['artists'][0]['name']
+        album_name = api_response['tracks']['items'][i]['album']['name']
+        album_release_date = api_response['tracks']['items'][i]['album']['release_date']
+        popularity = api_response['tracks']['items'][i]['popularity']
+        genre = genre
+## adicionando valores retornados na interaçao em uma lista de dicionário
+
+        track_df.append(
+            {
+            'track_id': track_id,
+            'track_name': track_name,
+            'track_duration_ms':track_duration_ms,
+            'artist_name': artist_name,
+            'album_name': album_name,
+            'album_release_date': album_release_date,
+            'popularity': popularity,
+            'genre': genre
+            }
+            )
+## Transforma lista em dataframe            
+tracks_dataset = pd.DataFrame(track_df)
+# %%
+tracks_dataset
 # %%
