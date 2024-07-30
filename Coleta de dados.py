@@ -169,42 +169,110 @@ track_df = pd.DataFrame(
 # %%
 print(f'Dataframe possui{track_df.shape[1]} colunas')
 track_df
+
 # %%
 # Para inserir todos os registros de músicas, faremos uma iteraçao sobre os registros, passando valor iteravel na chamadaa a API no api_response
-selected_genres = ['blues', 'rock', 'soul']
-limit = 5
-offset = 0
-track_df = []
+# Após investigar problema referente a solicitar itens de vários generos, foi descoberto que o índice de um item na resposta da API é perdido quando um gênero possui faixas insuficientes para o valor máximo solicitado.
+# Para resolver esse problema, foi implementado um comando "break" no código quando o número de itens é abaixo do limite ou igual a zero. Isso garante que cada lote de dados contenha 50 faixas. Além disso, nesta última interação da função, a variável "markets" foi adicionada para trazer dados de mais de um mercado.
+def tracks_dataset(genres, markets, limit, offset, pages, access_token):
+    """
+    Recupera dados de faixas da API do Spotify com base nos gêneros especificados, parâmetros de paginação e token de acesso.
 
-for genre in selected_genres:
-    url = f'https://api.spotify.com/v1/search?q=genre:{genre}&type=track&market=BR&limit={limit}&offset={offset}'
-    api_response = api_call(url, access_token)
+    Args:
+        genres (list): Uma lista de nomes de gêneros para os quais as faixas precisam ser obtidas da API do Spotify.
+        markets (list): Uma lista de códigos de país para os mercados disponíveis no Spotify (valor de acordo com o código de país ISO 3166-1 alpha-2).
+        limit (int): O número máximo de faixas a serem obtidas por requisição à API.
+        offset (int): O offset inicial para paginação para obter faixas da API.
+        pages (int): O número de páginas da API a serem buscadas para cada gênero.
+        access_token (str): O token de acesso necessário para autenticação com a API do Spotify.
+
+    Returns:
+        pandas.DataFrame: Um DataFrame do pandas contendo as informações das faixas extraídas, incluindo ID da faixa,
+        nome da faixa, duração, nome do artista, nome do álbum, data de lançamento do álbum, popularidade e gênero.
+
+    Funcionalidades:
+        - Itera pelos gêneros e páginas de paginação especificados para obter dados de faixas da API do Spotify.
+        - Extrai informações relevantes da resposta da API.
+        - Combina os dados extraídos em um DataFrame do pandas e retorna o DataFrame ao chamador.
+
+    Observações:
+        - A função faz várias chamadas à API com base nos gêneros e na paginação, processando os dados em um DataFrame.
+        - Usa o formato de URL do endpoint da API fornecido com espaços reservados para gênero, limite e offset.
+        - Assume a existência de uma função 'api_call' para fazer requisições à API.
+        - Requer o manuseio adequado do token de acesso usando a função 'get_token' ou um mecanismo semelhante.
+    """
+
+    offset_counter = offset
+    track_df = []
     
-    for i in range(limit):
-        track_id = api_response['tracks']['items'][i]['id']
-        track_name = api_response['tracks']['items'][i]['name']
-        track_duration_ms = api_response['tracks']['items'][i]['duration_ms']
-        artist_name = api_response['tracks']['items'][i]['artists'][0]['name']
-        album_name = api_response['tracks']['items'][i]['album']['name']
-        album_release_date = api_response['tracks']['items'][i]['album']['release_date']
-        popularity = api_response['tracks']['items'][i]['popularity']
-        genre = genre
-## adicionando valores retornados na interaçao em uma lista de dicionário
+    for market in markets:
+        for genre in genres:  
+            for page in range(pages):    
+                url = f'https://api.spotify.com/v1/search?q=genre:{genre}&type=track&market={market}&limit={limit}&offset={offset}'
+                api_response = api_call(url, access_token)
+                num_items = len(api_response['tracks']['items'])
 
-        track_df.append(
-            {
-            'track_id': track_id,
-            'track_name': track_name,
-            'track_duration_ms':track_duration_ms,
-            'artist_name': artist_name,
-            'album_name': album_name,
-            'album_release_date': album_release_date,
-            'popularity': popularity,
-            'genre': genre
-            }
-            )
-## Transforma lista em dataframe            
-tracks_dataset = pd.DataFrame(track_df)
+                if num_items == 0:
+                    break
+
+                for i in range(num_items):
+                    track_id = api_response['tracks']['items'][i]['id']
+                    track_name = api_response['tracks']['items'][i]['name']
+                    track_duration_ms = api_response['tracks']['items'][i]['duration_ms']
+                    artist_name = api_response['tracks']['items'][i]['artists'][0]['name']
+                    album_name = api_response['tracks']['items'][i]['album']['name']
+                    album_release_date = api_response['tracks']['items'][i]['album']['release_date']
+                    popularity = api_response['tracks']['items'][i]['popularity']
+                    genre = genre
+                    market = market
+
+                    track_df.append({
+                        'track_id': track_id,
+                        'track_name': track_name,
+                        'track_duration_ms': track_duration_ms,
+                        'artist_name': artist_name,
+                        'album_name': album_name,
+                        'album_release_date': album_release_date,
+                        'popularity': popularity,
+                        'genre': genre,
+                        'market': market
+                    })
+
+                offset += limit
+
+                if num_items < limit:
+                    break
+
+            offset = offset_counter
+
+        tracks_dataset = pd.DataFrame(track_df)    
+        return tracks_dataset
+
+
+
 # %%
-tracks_dataset
+genres = ['alt-rock', 'alternative', 'brazil', 'blues', 'electro', 'heavy-metal', 'hip-hop', 'house', 'jazz', 'pop', 'reggae', 'rock', 'soul', 'techno', 'trance'] 
+markets = ['BR']
+limit = 50
+offset = 0
+pages = 20
+access_token = access_token
+# %%
+tracks_df = tracks_dataset(genres, markets,limit,offset,pages,access_token)
+# %%
+print(f'Este dataset possui {tracks_df.shape[0]} linhas e {tracks_df.shape[1]} colunas ')
+# %%
+tracks_df.head()
+# %%
+#exportando Dataframe para CSV
+tracks_df.to_csv('spotify_dataset.csv')
+# %%
+tracks_df.dtypes
+# %%
+# iremos alterar coluna'album_release_date' para um objeto de data e hora.
+tracks_df['album_release_date'] = pd.to_datetime(tracks_df['album_release_date'], format='mixed')
+# %%
+tracks_df.dtypes
+# %%
+tracks_df.to_csv('spotify_dataset.csv')
 # %%
