@@ -258,21 +258,66 @@ offset = 0
 pages = 20
 access_token = access_token
 # %%
-tracks_df = tracks_dataset(genres, markets,limit,offset,pages,access_token)
+tracks_df_BR = tracks_dataset(genres, markets,limit,offset,pages,access_token)
 # %%
-print(f'Este dataset possui {tracks_df.shape[0]} linhas e {tracks_df.shape[1]} colunas ')
+print(f'Este dataset possui {tracks_df_BR.shape[0]} linhas e {tracks_df_BR.shape[1]} colunas ')
 # %%
-tracks_df.head()
+tracks_df_BR.head()
 # %%
 #exportando Dataframe para CSV
-tracks_df.to_csv('spotify_dataset.csv')
+tracks_df_BR.to_csv('spotify_dataset.csv')
 # %%
-tracks_df.dtypes
+tracks_df_BR.dtypes
 # %%
 # iremos alterar coluna'album_release_date' para um objeto de data e hora.
-tracks_df['album_release_date'] = pd.to_datetime(tracks_df['album_release_date'], format='mixed')
+tracks_df_BR['album_release_date'] = pd.to_datetime(tracks_df_BR['album_release_date'], format='mixed')
 # %%
-tracks_df.dtypes
+tracks_df_BR.dtypes
 # %%
-tracks_df.to_csv('spotify_dataset.csv')
+tracks_df_BR.to_csv('spotify_dataset.csv')
+# %%
+# Para fins de análise, coletaremos dados referentes a outros mercados. A comparaçao será feita entre os 3 maiores países em streams, EUA, Brasil e México
+#US
+tracks_df_US = tracks_dataset(genres, ['US'],limit,offset,pages,access_token)
+
+# %%
+tracks_df_US.head()
+
+# %%
+# Mexico
+tracks_df_MX = tracks_dataset(genres, ['MX'],limit,offset,pages,access_token)
+tracks_df_MX.head()
+# %%
+tracks_df_US.shape
+# %%
+## Utilaremos o metódo concat do Pandas, pois com ele é possível empilhar linhas de diferentes dataframes se as colunas forem as mesmas
+tracks_concat = pd.concat([tracks_df_BR,tracks_df_US,tracks_df_MX], ignore_index= True)
+# %%
+tracks_concat.shape
+# %%
+print(f'Este dataset possui {tracks_concat.shape[0]} linhas e {tracks_concat.shape[1]} colunas ')
+# %%
+tracks_concat
+# %%
+tracks_concat.to_csv('spotify_dataset_BR_US_MX.csv')
+# %%
+tracks_sorted= tracks_concat[['track_name','artist_name','album_release_date','genre','market','popularity']].sort_values(by='popularity', ascending=False)
+
+# %%
+tracks_sorted
+# %%
+tracks_sorted.sort_values(by='market', ascending=True)
+# %%
+# Para descobrir os dados referente a um unico cantor, como por exemplo Post Malone, realizamos filtro abaixco
+post_tracks = tracks_concat[tracks_concat['artist_name'] == 'Post Malone']
+
+post_tracks
+# %%
+# Filtramos as musicas mais populares do momento de Post Malone em cada Mercado. Vale dizer que o atributo popularity se refere a apenas um recorte do momento, ele é um dado atual
+
+Post_tracks_sorted = post_tracks.sort_values(by=['market','popularity'], ascending= False)
+Post_tracks_sorted
+# %%
+all_tracks_sorted_by_popularity_market = tracks_concat.sort_values(by=['market','popularity'], ascending=[True,False])
+all_tracks_sorted_by_popularity_market.head(20)
 # %%
