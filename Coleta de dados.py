@@ -5,13 +5,15 @@
 import pandas as pd
 import requests
 import base64
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # %%
 
 # Adicionando credenciais de app do Spotify para solicitar token de acesso a API
 # Inserir informações de acordo com app criado no Spotify
-client_id = '5f229361801a4b62a9cf37e0ae65c5a2'
-client_secret = '4691930e87594fa78f3f55b68620e16e'
+client_id = 'INSIRA CLIENT ID'
+client_secret = 'INSIRA CLIENT SECRET'
 
 
 
@@ -320,4 +322,81 @@ Post_tracks_sorted
 # %%
 all_tracks_sorted_by_popularity_market = tracks_concat.sort_values(by=['market','popularity'], ascending=[True,False])
 all_tracks_sorted_by_popularity_market.head(20)
+# %%
+#Durante análise dos dados do dataframe, observamos alguns campos vazios, como eram poucos, realizamos dropna nesses valores
+df = pd.read_excel('spotify_dataset_BR_US_MX.xlsx')
+df.isnull().sum()
+
+# %%
+df.dropna(inplace=True)
+# %%
+df.isnull().sum()
+# %%
+df.to_excel('cleaned_spotify_dataset_BR_US_MX.xlsx')
+df.head()
+# %%
+df_cleaned = pd.read_excel('cleaned_spotify_dataset_BR_US_MX.xlsx')
+df_cleaned['popularity'].hist(bins=20)
+# %%
+## Média de popularidade por gênero
+popularity_by_genre = df_cleaned.groupby('genre')['popularity'].mean()
+popularity_by_genre.plot()
+# %%
+#média de popularidade de genero por mercado 
+popularity_by_market_by_genre = df.groupby(['market','genre'])['popularity'].mean().reset_index()
+
+
+plt.figure(figsize=(14, 8))
+sns.barplot(x='genre', y='popularity', hue='market', data=popularity_by_market_by_genre)
+plt.title('Popularidade Média por Gênero e Mercado')
+plt.xlabel('Gênero')
+plt.ylabel('Popularidade Média')
+plt.legend(title='Mercado', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.xticks(rotation=45)
+plt.show()
+
+
+# %%
+#artistas mais populares
+df_artists_popularity = df.groupby('artist_name')['popularity'].mean().sort_values(ascending=False)
+df_artists_popularity
+# %%
+# artistas mais populares por mercado
+df_artists_popularity_by_market = df.groupby(['market','artist_name'])['popularity'].mean().sort_values(ascending=False).reset_index()
+df_artists_popularity_by_market
+# %%
+df['artist_name'] = df['artist_name'].astype(str)
+
+
+
+# %%
+plt.figure(figsize=(14, 8))
+sns.barplot(x='popularity', y='artist_name', hue='market', data=df_artists_popularity_by_market, dodge=False)
+plt.title('Popularidade Média por Artista e Mercado')
+plt.xlabel('Popularidade Média')
+plt.ylabel('Artista')
+plt.legend(title='Mercado', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+# %%
+
+df_top_artists_by_market = df_artists_popularity_by_market.groupby('market').head(10)
+# %%
+plt.figure(figsize=(14, 8))
+sns.barplot(x='popularity', y='artist_name', hue='market', data=df_top_artists_by_market, dodge=True)
+plt.title('Popularidade Média por Artista e Mercado')
+plt.xlabel('Popularidade Média')
+plt.ylabel('Artista')
+plt.legend(title='Mercado', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+# %%
+df_pivot = df_top_artists_by_market.pivot(index='artist_name', columns='market', values='popularity').head(10)
+
+# Plotar gráfico de barras empilhadas
+df_pivot.plot(kind='bar', stacked=True, figsize=(14, 8))
+plt.title('Popularidade Média por Artista e Mercado')
+plt.xlabel('Artista')
+plt.ylabel('Popularidade Média')
+plt.legend(title='Mercado')
+plt.show()
+
 # %%
