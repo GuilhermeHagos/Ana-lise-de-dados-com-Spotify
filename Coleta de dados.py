@@ -398,5 +398,3 @@ plt.xlabel('Artista')
 plt.ylabel('Popularidade Média')
 plt.legend(title='Mercado')
 plt.show()
-
-# %%
