@@ -1,7 +1,8 @@
 # Analise-de-dados-com-Spotify
- Este repositório contém arquivo jupyter notbook a qual busquei desenvolver conhecimentos adquiridos em projeto de análise de dados. Este projeto contém desde como trabalhar com a API no spotify, até a coleta de dados da mesma, análise exploratório sobre os dados retornados, limpeza de Dataframe gerado com os registros, bem como como disponibilização em formato excel após tratativas e visualizaçoes com intuito de explorar alguns questionamento quanto aos dados.
+ Este repositório contém programa a qual busquei desenvolver conhecimentos adquiridos em projeto de análise de dados. Este projeto contém desde como trabalhar com a API no spotify, até a coleta de dados da mesma, análise exploratória sobre os dados retornados, limpeza de Dataframe gerado com os registros, bem como como disponibilização em formato excel após tratativas e visualizaçoes com intuito de explorar alguns questionamento quanto aos dados.
+Neste repositório se encontram dois arquivos executaveis, o '[Coleta de dados.py](https://github.com/GuilhermeHagos/Ana-lise-de-dados-com-Spotify/blob/main/Coleta%20de%20dados.py)' que contém todos os meus passos em ordem de execução, juntamente com comentários próprios (será mais util caso você deseje entender meu raciocinio e/ou como foi realizado acesso a API/coleta dos dados). Caso apenas a parte de análise de dados te interesse, onde realizei e respondi alguns questionamentos, há um arquivo jupyter notbook, o '[Tratamento_dados_e_analise_dataframe.ipynb](https://github.com/GuilhermeHagos/Ana-lise-de-dados-com-Spotify/blob/main/Tratamento_dados_e_analise_dataframe.ipynb)'.
 
- Para facilitar entendimento, as etapas executadas no jupyter notbook estarão elencadas abaixo:
+ Para facilitar entendimento, as etapas executadas no projeto estarão elencadas abaixo:
 
 ## Etapas
 
@@ -11,7 +12,7 @@
     
 3. Após termos nosso Dataframe, iniciamos processo de análise exploratória, onde buscamos entender nossos dados como um todo, identificando tipos de colunas, registros de linhas, formatação de colunas, registros faltantes, entre outros. Após identificação, realizamos tratativas para estes pontos e geramos arquivo em formato excelc contendo Dataframe tratado.
     
-4. Com dados tratados, começamos a responder algumas perguntas, como: Quais são os gêneros de músicas mais populares? e por mercados? Como é o desempenho das músicas do cantor Post Malone nos mercados de Brasil, EUA e México?. Através dessas perguntas, criamos visualizações utilizando as bibliotecas Matplotlib e Seaborn para identificar as respostas.
+4. Com dados tratados, começamos a responder algumas perguntas, como: Quais são os gêneros de músicas mais populares? e por mercados? Como é o desempenho das músicas do cantor Post Malone nos mercados de Brasil, EUA e México?. Através de perguntas como estas, criamos visualizações utilizando as bibliotecas Matplotlib e Seaborn para identificar as respostas.
 ## Referência
 
 - [Acessando API do Spotify, por Gabril Pastega](https://medium.com/@gabrielpbreis/como-acessar-a-api-do-spotify-com-python-fb9415f29bda)
