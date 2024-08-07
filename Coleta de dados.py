@@ -181,12 +181,7 @@ def tracks_dataset(genres, markets, limit, offset, pages, access_token):
     Recupera dados de faixas da API do Spotify com base nos gêneros especificados, parâmetros de paginação e token de acesso.
 
     Args:
-        genres (list): Uma lista de nomes de gêneros para os quais as faixas precisam ser obtidas da API do Spotify.
-        markets (list): Uma lista de códigos de país para os mercados disponíveis no Spotify (valor de acordo com o código de país ISO 3166-1 alpha-2).
-        limit (int): O número máximo de faixas a serem obtidas por requisição à API.
-        offset (int): O offset inicial para paginação para obter faixas da API.
-        pages (int): O número de páginas da API a serem buscadas para cada gênero.
-        access_token (str): O token de acesso necessário para autenticação com a API do Spotify.
+        genres (list),markets (list), limit (int),offset (int), pages (int), access_token (str)
 
     Returns:
         pandas.DataFrame: Um DataFrame do pandas contendo as informações das faixas extraídas, incluindo ID da faixa,
@@ -315,7 +310,7 @@ post_tracks = tracks_concat[tracks_concat['artist_name'] == 'Post Malone']
 
 post_tracks
 # %%
-# Filtramos as musicas mais populares do momento de Post Malone em cada Mercado. Vale dizer que o atributo popularity se refere a apenas um recorte do momento, ele é um dado atual
+# Filtramos as musicas mais populares do momento de Post Malone em cada Mercado. Vale dizer que o atributo popularity se refere a apenas um recorte do momento, ele é apenas um indicador atual
 
 Post_tracks_sorted = post_tracks.sort_values(by=['market','popularity'], ascending= False)
 Post_tracks_sorted
